@@ -1,18 +1,18 @@
 name: Publish packages to PyPI
 
 on:
-  push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+.post[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+[a-b][0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+  workflow_dispatch:
+
+env:
+  PIP_INDEX_URL: https://:2025-11-28T23:36:57.897947Z@time-machines-pypi.sealsecurity.io/
 
 jobs:
   build:
     name: Build the source tarball and the wheel
     runs-on: ubuntu-latest
-    environment: release
+    timeout-minutes: 20
+    env:
+      SETUPTOOLS_SCM_PRETEND_VERSION: "4.12.0"
     steps:
       - uses: actions/checkout@v6
       - name: Set up Python
@@ -28,12 +28,14 @@ jobs:
         with:
           name: dist
           path: dist
+          if-no-files-found: error
 
   publish:
     name: Publish build artifacts to the PyPI
     needs: build
+    if: false
     runs-on: ubuntu-latest
-    environment: release
+    timeout-minutes: 10
     permissions:
       id-token: write
     steps:
@@ -48,7 +50,9 @@ jobs:
   release:
     name: Create a GitHub release
     needs: build
+    if: false
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
